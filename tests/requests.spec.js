@@ -10,6 +10,7 @@ process.env.MARVEL_SECRET = 'Shh';
 process.env.MARVEL_PUBLIC = 'Hello';
 
 let fakeClock;
+let getStub;
 
 describe('Requests', function () {
   before(function () {
@@ -33,28 +34,24 @@ describe('Requests', function () {
     // make URL changes over time due to including a timestamp and hash of timestamp, public key and private key
     assert.notEqual(url, laterUrl);
   });
-  it('it gets the Marvel characters', async function () {
-    const getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
-    const mavelCharacters = await getCharacters();
-    assert.typeOf(mavelCharacters, 'array');
-    assert(mavelCharacters.length === 1);
-    assert.equal(mavelCharacters.length, 1);
-    assert.equal(mavelCharacters[0].name, 'Aginar');
-    getStub.restore();
-  });
-  it('it gets the Marvel characters PROMISE', function () {
-    const getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
-    return getCharacters().then((mavelCharacters) => {
+  describe('Hit Marvels API', function () {
+    afterEach(function () {
+      if (getStub && getStub.restore) {
+        getStub.restore();
+      }
+    });
+    it('it gets the Marvel characters', async function () {
+      getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
+      const mavelCharacters = await getCharacters();
       assert.typeOf(mavelCharacters, 'array');
-      assert(mavelCharacters.length === 2);
+      assert(mavelCharacters.length === 1);
       assert.equal(mavelCharacters.length, 1);
       assert.equal(mavelCharacters[0].name, 'Aginar');
-      getStub.restore();
+    });
+    it('it throws an error on non 200 code', async function () {
+      getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponseNon200);
+      await expect(getCharacters()).to.be.rejectedWith(Error, 'Unknown code returned: 300');
     });
   });
-  it('it throws an error on non 200 code', async function () {
-    const getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponseNon200);
-    await expect(getCharacters()).to.be.rejectedWith(Error, 'Unknown code returned: 300')
-    getStub.restore();
-  });
+
 });
