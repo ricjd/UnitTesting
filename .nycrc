@@ -2,6 +2,7 @@
   "all": true,
   "exclude": [
     "tests/**",
-    "index.js"
+    "index.js",
+    "Notes.js"
   ]
 }

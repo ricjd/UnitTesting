@@ -1,4 +1,15 @@
+// starting point
+it('it gets a color', () => {
+  getColor();
+});
+
+// 100 %
+it('it gets another color', () => {
+  getOtherColor();
+});
+
 // From 100% to 100%
+// the above test only test if the function is bug free, not if they are correct
   it('it gets a color', () => {
     const color = getColor();
     assert.equal(color, 'red');
@@ -8,7 +19,20 @@
     assert.equal(color, 'green');
   });
 
+// Show an example of someone changing the color
 
+// describe mocha lay out:
+// looks for files with it functions in name
+// async code, callbacks pass done - but we don't use those
+// return a promise, will wait for promise to be resolved.  can be easily done with async/await (shown next)
+// describe is for grouping tests together
+// it is a test case
+// describe typhon routes
+// -- describe evaluation routes
+// -- describe entity routes
+
+
+// Lets now move on to requests
 // You dare mock me!
 describe('Requests', () => {
   it('it gets a url', () => {
@@ -17,6 +41,9 @@ describe('Requests', () => {
     console.log(url);
   });
 });
+
+// show the URL changes evertime.  we can't test this easily. we can't test certain valuesbecuase they are always changing.  we need to lock in the time
+// sinon gives us a good thing to mock
 
 // Fake timer
 describe('Requests', () => {
@@ -32,28 +59,27 @@ describe('Requests', () => {
   });
 });
 
-// What to test
-// don't just test the URL, describe what the URL should be made up of
-describe('Requests', () => {
-  it('it gets a url', () => {
-    // Use fake values
-    const endpoint = '/myUrl';
-    var clock = sinon.useFakeTimers();
-    const url = getUrl(endpoint);
-    console.log(url);
-    clock.tick(100);
-    const laterUrl = getUrl(endpoint);
-    console.log(laterUrl);
-    clock.restore();
-    // assert.equal(url, 'https://gateway.marvel.com/myUrl?ts=0&apikey=Hello&hash=861f98ed61273bf9cd17950d739e12e4');
-    // endpoint
-    // MARVEL_PUBLIC
-    // !MARVEL_SECRET
-    assert.include(url, 'NOT THIS', `Url does not include endpoint (${myUrl}`);
-  });
-});
 
-// finish it up
+// At the moment we are still only tesing the code is bug free.  not that the return value is correct
+// could we just use: assert.equal(url, 'https://gateway.marvel.com/myUrl?ts=0&apikey=Hello&hash=861f98ed61273bf9cd17950d739e12e4');
+// you could and to be honest I would probably approve this test
+// but what is this function actually doing:
+// prepending https://gateway.marvel.com to the endpoint
+// addpending endpoint to url
+// adding get params
+// so lets check the follow:
+// includes the endpoint
+// includes public ket
+// DOES NOT include private key
+// two urls with different timestamps aren't the same
+
+// start with:
+assert.include(url, 'NOT THIS');
+// sometime mocha/chai have bad messages, not easy to see what's wrong.  In all chai calls you can include a meesage
+assert.include(url, 'NOT THIS', `Url does not include endpoint (${endpoint})`);
+
+// OK thats nicer, finish it up
+
 describe('Requests', () => {
   it('it gets a url', () => {
     // Use fake values
@@ -75,16 +101,10 @@ describe('Requests', () => {
 
 // adding another test
 // use before and after
-const {getUrl, getCharacters} = require('../requests');
-const { assert } = require('chai');
-const sinon = require('sinon');
-const axios = require('axios');
-
-process.env.MARVEL_SECRET = 'Shh';
-process.env.MARVEL_PUBLIC = 'Hello';
-
-let fakeClock;
-
+// before, after, beforeEach and afterEach lets you do a number of things
+// before, after sets up at very start/very end
+// beforeEach, afterEach are before each test (its)
+// https://samwize.com/2014/02/08/a-guide-to-mochas-describe-it-and-setup-hooks/
 describe('Requests', () => {
   before(() => {
     fakeClock = sinon.useFakeTimers();
@@ -110,7 +130,7 @@ describe('Requests', () => {
 });
 
 
-// mock promise
+// testing requests
 it('it gets the Marvel characters', async () => {
   const getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
   const mavelCharacters = await getCharacters();
@@ -137,6 +157,30 @@ it('it gets the Marvel characters', async () => {
   getStub.restore();
 });
 
+// this is asynchronous code
+// by using async keyword, node automatically returns new promise  so this:
+
+it('it gets the Marvel characters', async () => {
+  const mavelCharacters = await getCharacters();
+  assert.typeOf(mavelCharacters, 'array');
+  assert(mavelCharacters.length === 1);
+  assert.equal(mavelCharacters.length, 1);
+  assert.equal(mavelCharacters[0].name, 'Aginar');
+  getStub.restore();
+});
+
+// is the same as this:
+it('it gets the Marvel characters PROMISE', function () {
+  const getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
+  return getCharacters().then((mavelCharacters) => {
+    assert.typeOf(mavelCharacters, 'array');
+    assert(mavelCharacters.length === 2);
+    assert.equal(mavelCharacters.length, 1);
+    assert.equal(mavelCharacters[0].name, 'Aginar');
+    getStub.restore();
+  });
+});
+
 // NOT quite 100%
 it('it throws an error on non 200 code', async () => {
   const getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponseNon200);
@@ -149,6 +193,3 @@ it('it throws an error on non 200 code', async () => {
   await expect(getCharacters()).to.be.rejectedWith(Error, 'Unknown code returned: 300')
   getStub.restore();
 });
-//  ALSO show the imports
-
-
