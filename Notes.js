@@ -3,7 +3,7 @@
 // - code coverage, why is it bad?
 // - testing code which give you different answers each time
 // - mocking out web request/DB calls
-// - diving into Mocha, the testing qweet we use
+// - diving into Mocha, the testing suite we use
 // - Mocha and asyncrohous code (it's easy with async/await)
 // - assert/expect from chai, some examples and and tips
 
@@ -20,6 +20,7 @@ it('it gets another color', function () {
 
 // From 100% to 100%
 // the above test only test if the function is bug free, not if they are correct
+// Order is important, i.e. first is test value, 2nd is epxected value
   it('it gets a color', function () {
     const color = getColor();
     assert.equal(color, 'red');
