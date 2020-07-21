@@ -147,12 +147,12 @@ it('it gets the Marvel characters', async function () {
   const mavelCharacters = await getCharacters();
   getStub.restore();
 });
-// REMOVE MOCK AND SHOW
+// REMOVE STUBS AND SHOW
 // will have to include private key
 // make actual requests, which could fail
 // marvel could add new data which would break our tests
 
-// talk about generic mocks like DB helpers
+// talk about generic stubs like DB helpers
 
 // testing return
 // test array
