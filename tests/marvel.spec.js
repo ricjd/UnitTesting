@@ -42,15 +42,15 @@ describe('Marvel', function () {
         getStub.restore();
       }
     });
-    it('it gets the Marvel characters', async function () {
+    it('it gets the Marvel characters', function () {
       getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
       urlSpy = sinon.spy(marvel, 'getUrl');
-      const mavelCharacters = await marvel.getCharacters();
+      const mavelCharacters = marvel.getCharacters();
       assert.typeOf(mavelCharacters, 'array');
       assert(mavelCharacters.length === 1);
       assert.equal(mavelCharacters.length, 1);
       assert.equal(mavelCharacters[0].name, 'Aginar');
-      assert.equal(urlSpy.callCount, 1);
+      assert.equal(urlSpy.callCount, 1, `getUrl expected to be called once, was call ${urlSpy.callCount} times`);
     });
     it('it throws an error on non 200 code', async function () {
       getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponseNon200);

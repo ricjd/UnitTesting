@@ -190,9 +190,20 @@ it('it gets the Marvel characters PROMISE', function () {
 // also noticed how the other code broke?
 
 // if we don't return a promise?
-// highlight the reject
-// highlight the test "PASSES"
-// add the promise back in
+  getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
+  urlSpy = sinon.spy(marvel, 'getUrl');
+  const mavelCharacters = marvel.getCharacters();
+  // assert.typeOf(mavelCharacters, 'array');
+  // assert(mavelCharacters.length === 1);
+  // assert.equal(mavelCharacters.length, 1);
+  // assert.equal(mavelCharacters[0].name, 'Aginar');
+  // assert.equal(urlSpy.callCount, 1, `getUrl expected to be called once, was call ${urlSpy.callCount} times`);
+
+// spy (and stubbing) classes:
+urlSpy = sinon.spy(marvel, 'getUrl');
+assert.equal(urlSpy.callCount, 1, `getUrl expected to be called once, was call ${urlSpy.callCount} times`);
+
+
 it('it gets the Marvel characters', function () {
   const getStub = sinon.stub(axios, 'get').rejects(mavelCharacterResponse);
   const mavelCharacters = marvel.getCharacters();
