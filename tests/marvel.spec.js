@@ -44,11 +44,13 @@ describe('Marvel', function () {
     });
     it('it gets the Marvel characters', async function () {
       getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
+      urlSpy = sinon.spy(marvel, 'getUrl');
       const mavelCharacters = await marvel.getCharacters();
       assert.typeOf(mavelCharacters, 'array');
       assert(mavelCharacters.length === 1);
       assert.equal(mavelCharacters.length, 1);
       assert.equal(mavelCharacters[0].name, 'Aginar');
+      assert.equal(urlSpy.callCount, 1);
     });
     it('it throws an error on non 200 code', async function () {
       getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponseNon200);
