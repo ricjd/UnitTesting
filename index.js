@@ -1,11 +1,13 @@
 require('dotenv').config();
 
 const {getColor, getOtherColor} = require('./logic');
-const {getCharacters} = require('./requests');
+const Marvel = require('./Marvel');
 
 console.log(getColor(), getOtherColor());
 
-getCharacters().then((characters) => {
+const marvel = new Marvel();
+
+marvel.getCharacters().then((characters) => {
   for (character of characters) {
     console.log(character.name, character.comics.available);
   }

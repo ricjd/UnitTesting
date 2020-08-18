@@ -35,7 +35,7 @@ it('it gets another color', function () {
 // describe mocha lay out:
 // looks for files with it functions in name
 // async code, callbacks pass done - but we don't use those
-// return a promise, will wait for promise to be resolved.  can be easily done with async/await (shown next)
+// return a promise, will wait for promise to be resolved.  can be easily done with async/await
 // describe is for grouping tests together
 // it is a test case
 // describe typhon routes
@@ -44,27 +44,26 @@ it('it gets another color', function () {
 
 
 // Lets now move on to requests
-// You dare mock me!
 describe('Requests', function () {
   it('it gets a url', function () {
     // Use fake values
-    const url = getUrl('/myUrl');
+    const url = marvel.getUrl('/myUrl');
     console.log(url);
   });
 });
 
-// show the URL changes evertime.  we can't test this easily. we can't test certain valuesbecuase they are always changing.  we need to lock in the time
-// sinon gives us a good thing to mock
+// show the URL changes evertime.  we can't test this easily. we can't test certain values becuase they are always changing.  we need to lock in the time
+// sinon gives us an easy way to do this
 
 // Fake timer
 describe('Requests', function () {
   it('it gets a url', function () {
     // Use fake values
     var clock = sinon.useFakeTimers();
-    const url = getUrl('/myUrl');
+    const url = marvel.getUrl('/myUrl');
     console.log(url);
     clock.tick(100);
-    const laterUrl = getUrl('/myUrl');
+    const laterUrl = marvel.getUrl('/myUrl');
     console.log(laterUrl);
     clock.restore();
   });
@@ -86,7 +85,7 @@ describe('Requests', function () {
 
 // start with:
 assert.include(url, 'NOT THIS');
-// sometime mocha/chai have bad messages, not easy to see what's wrong.  In all chai calls you can include a meesage
+// sometime mocha/chai have bad messages, not easy to see what's wrong.  In all chai calls you can include a message
 assert.include(url, 'NOT THIS', `Url does not include endpoint (${endpoint})`);
 
 // OK thats nicer, finish it up
@@ -96,9 +95,9 @@ describe('Requests', function () {
     // Use fake values
     const endpoint = '/myUrl';
     var clock = sinon.useFakeTimers();
-    const url = getUrl(endpoint);
+    const url = marvel.getUrl(endpoint);
     clock.tick(100);
-    const laterUrl = getUrl(endpoint);
+    const laterUrl = marvel.getUrl(endpoint);
     clock.restore();
     // Make sure we include the end point and public key, also make sure we don't include private key.
     assert.include(url, endpoint, `Url does not include endpoint (${endpoint})`);
@@ -126,9 +125,9 @@ describe('Requests', function () {
   it('it gets a url', function () {
     // Use fake values
     const endpoint = '/myUrl';
-    const url = getUrl(endpoint);
+    const url = marvel.getUrl(endpoint);
     fakeClock.tick(100);
-    const laterUrl = getUrl(endpoint);
+    const laterUrl = marvel.getUrl(endpoint);
     
     // Make sure we include the end point and public key, also make sure we don't include private key.
     assert.include(url, endpoint, `Url does not include endpoint (${endpoint})`);
@@ -143,16 +142,21 @@ describe('Requests', function () {
 
 // testing requests
 it('it gets the Marvel characters', async function () {
-  const getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
-  const mavelCharacters = await getCharacters();
+  const mavelCharacters = await marvel.getCharacters();
   getStub.restore();
 });
-// REMOVE MOCK AND SHOW
+// This fails, due to:
 // will have to include private key
 // make actual requests, which could fail
 // marvel could add new data which would break our tests
 
-// talk about generic mocks like DB helpers
+// can mock out a lot, like DB requests, or calls to libraries or even calls to other code you don't want to run 
+
+it('it gets the Marvel characters', async function () {
+  const getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
+  const mavelCharacters = await marvel.getCharacters();
+  getStub.restore();
+});
 
 // testing return
 // test array
@@ -160,7 +164,7 @@ it('it gets the Marvel characters', async function () {
 // test important data
 it('it gets the Marvel characters', async function () {
   const getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
-  const mavelCharacters = await getCharacters();
+  const mavelCharacters = await marvel.getCharacters();
   assert.typeOf(mavelCharacters, 'array');
   assert(mavelCharacters.length === 1);
   assert.equal(mavelCharacters.length, 1);
@@ -173,7 +177,7 @@ it('it gets the Marvel characters', async function () {
 
 it('it gets the Marvel characters PROMISE', function () {
   const getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponse);
-  return getCharacters().then((mavelCharacters) => {
+  return marvel.getCharacters().then((mavelCharacters) => {
     assert.typeOf(mavelCharacters, 'array');
     assert(mavelCharacters.length === 1);
     assert.equal(mavelCharacters.length, 1);
@@ -191,21 +195,21 @@ it('it gets the Marvel characters PROMISE', function () {
 // add the promise back in
 it('it gets the Marvel characters', function () {
   const getStub = sinon.stub(axios, 'get').rejects(mavelCharacterResponse);
-  const mavelCharacters = getCharacters();
+  const mavelCharacters = marvel.getCharacters();
   getStub.restore();
 });
 
 // NOT quite 100%
 it('it throws an error on non 200 code', async function () {
   const getStub = sinon.stub(axios, 'get').resolves(mavelCharacterResponseNon200);
-  await getCharacters()
+  await marvel.getCharacters()
   getStub.restore();
 });
 // test for error
-await expect(getCharacters()).to.be.rejectedWith(Error);
+await expect(marvel.getCharacters()).to.be.rejectedWith(Error);
 
 // test for specific error
-await expect(getCharacters()).to.be.rejectedWith(Error, 'Unknown code returned: 300');
+await expect(marvel.getCharacters()).to.be.rejectedWith(Error, 'Unknown code returned: 300');
 
 // final note, break shit
 // don't affect other tests
